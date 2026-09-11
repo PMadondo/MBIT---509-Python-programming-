@@ -1,9 +1,12 @@
-|import time
+import time
+import functools
 
 def rate_limit(max_calls: int, period: int):
     def decorator(func):
         calls = []
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
+            nonlocal calls
             now = time.time()
             # Remove timestamps older than the period window
             calls = [t for t in calls if now - t < period]
@@ -17,6 +20,7 @@ def rate_limit(max_calls: int, period: int):
 @rate_limit(max_calls=3, period=10)
 def fetch_user_data(user_id):
     return f"Data for {user_id}"
+
 
 # Bug 1 - This is because calls is assigned within the Python treats it as a local variable throughout wrapper. Then, on the right side of that same line, one will be try to read the local variable before it has been assigned, which  then results in the UnboundLocalError.
 
