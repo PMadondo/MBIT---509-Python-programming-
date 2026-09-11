@@ -1,4 +1,4 @@
-import time
+|import time
 
 def rate_limit(max_calls: int, period: int):
     def decorator(func):
@@ -17,6 +17,10 @@ def rate_limit(max_calls: int, period: int):
 @rate_limit(max_calls=3, period=10)
 def fetch_user_data(user_id):
     return f"Data for {user_id}"
+
+# Bug 1 - This is because calls is assigned within the Python treats it as a local variable throughout wrapper. Then, on the right side of that same line, one will be try to read the local variable before it has been assigned, which  then results in the UnboundLocalError.
+
+# Bug 2 - Modify the state tracking by storing timestamps on the instance (self) instead of in a shared closure. The wrapper can use the first argument (self) as the key rate-limit access.
 
 
 
